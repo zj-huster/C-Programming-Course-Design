@@ -50,8 +50,56 @@ void sign_up(int *flag)
         //注册
         if(mouse_left_press_check(320, 360, 520, 400) == 1)
         {
-            if (judge_account(Account.string) == 1) {
-                
+            //判断用户名是否存在
+            if (judge_account(Account.string) == 1) 
+            {
+                //用户名存在，注册失败，提示用户重新输入
+                mouse_hide();
+                setfillstyle(SOLID_FILL, WHITE);
+                bar(200, 322, 499, 348);
+                hz(280, 330, "账号已存在", 16, 16, RED);
+                delay(1000);
+                mouse_show();
+            }else{
+                //用户名不存在，继续判断密码
+                //密码是否超过5位数
+                if (judge_password_length(Password.string) == 0)
+                {
+                    //密码少于5位数，注册失败，提示用户重新输入
+                    mouse_hide();
+                    setfillstyle(SOLID_FILL, WHITE);
+                    bar(200, 322, 499, 348);
+                    hz(280, 330, "密码须在五位以上", 16, 16, RED);
+                    delay(1000);
+                    mouse_show();
+                }else
+                {
+                    //两次输入的密码超过5位数
+                    //再判断两次输入的密码是否一致
+                    if (strcmp(Password.string, Confirm.string) == 0)
+                    {
+                        //两次输入的密码一致
+                        //将用户名和密码写入文件
+                        write_user_info(Account.string, Password.string);
+                        mouse_hide();
+                        setfillstyle(SOLID_FILL, WHITE);
+                        bar(200, 322, 499, 348);
+                        hz(280, 330, "成功！", 16, 16, GREEN);
+                        delay(1000);
+                        mouse_show();
+                        *flag = WELCOME;
+                        break;
+                    }else
+                    {
+                        //两次输入的密码不一致，注册失败，提示用户重新输入
+                        mouse_hide();
+                        setfillstyle(SOLID_FILL, WHITE);
+                        bar(200, 322, 499, 348);
+                        hz(280, 330, "两次输入的密码不一致", 16, 16, RED);
+                        delay(1000);
+                        mouse_show();
+                    }
+                }
             }
         }
         else if (mouse_hover(320, 360, 520, 400) == 1)

@@ -15,6 +15,7 @@
 #include"Mouse.h"
 
 #define KEY_IN_MAX 10//宏定义：输入最大长度
+#define PASSWORD_MIN_LENGTH 5//宏定义：密码最短长度
 
 #define WELCOME 1
 #define SIGN_UP 2
@@ -35,6 +36,6 @@ typedef struct
 {
 	char username[KEY_IN_MAX + 1];//用户名
 	char password[KEY_IN_MAX + 1];//密码
-}UserInfo;
+}User;
 
 #endif

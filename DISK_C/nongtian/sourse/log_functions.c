@@ -127,7 +127,67 @@ void input_line(int x, int y, KeyIn* word, int size)
 **************************************************/
 int judge_account(char* account)
 {
+    FILE* fp;
+    int length = 0;
+    int i = 0;
+    User * user = NULL;
 
+    if ((fp = fopen("database\\UserInfo.dat", "rb")) == NULL)
+    {
+        closegraph();
+        printf("\nUserInfo.dat error file");
+        delay(3000);
+        exit(1); // 打开失败，退出程序
+    }
+
+    /*计算用户数量*/
+    fseek(fp, 0, SEEK_END);
+    length = ftell(fp) / sizeof(User); // 账户数量
+
+    for (i = 0; i < length; i++)
+    {
+        /*分配空间*/
+        if ((user = (User*)malloc(sizeof(User))) == NULL)
+		{
+			closegraph();
+			printf("memory error JudgeSameName");
+			delay(3000);
+			exit(1);//分配空间不足，退出程序
+		}
+        /*读取数据*/
+        fseek(fp, i * sizeof(User), SEEK_SET);
+		fread(user, sizeof(User), 1, fp);
+        /*判断用户名是否相同*/
+        if (strcmp(user->username, account) == 0)
+        {
+            /*关闭文件*/
+            if (fclose(fp) != 0)
+            {
+                closegraph();
+                printf("\nError in closing file UserInfo.");
+                delay(3000);
+                exit(1);
+            }
+            /*释放空间*/
+            free(user);
+            user = NULL;
+            //存在相同的用户名 (返回 1)
+            return 1;
+        }else
+        {
+            free(user);
+            user = NULL;
+        }
+    }
+    /*关闭文件*/
+    if (fclose(fp)!= 0)
+    {
+        closegraph();
+        printf("\nError in closing file UserInfo.");
+        delay(3000);
+        exit(1);
+    }
+    return 0; // 不存在相同的用户名 (返回 0)
 }
 
 /**************************************************
@@ -137,5 +197,139 @@ int judge_account(char* account)
 **************************************************/
 int judge_password(char* account, char* password)
 {
+    FILE* fp;
+    int length = 0;
+    int i = 0;
+    User * user = NULL;
 
+    if ((fp = fopen("database\\UserInfo.dat", "rb")) == NULL)
+    {
+        closegraph();
+        printf("\nUserInfo.dat error file");
+        delay(3000);
+        exit(1); // 打开失败，退出程序
+    }
+
+    /*计算用户数量*/
+    fseek(fp, 0, SEEK_END);
+    length = ftell(fp) / sizeof(User); // 账户数量
+
+    for (i = 0; i < length; i++)
+    {
+        /*分配空间*/
+        if ((user = (User*)malloc(sizeof(User))) == NULL)
+		{
+			closegraph();
+			printf("memory error JudgeSameName");
+			delay(3000);
+			exit(1);//分配空间不足，退出程序
+		}
+        /*读取数据*/
+        fseek(fp, i * sizeof(User), SEEK_SET);
+		fread(user, sizeof(User), 1, fp);
+        /*判断用户名是否相同*/
+        if (strcmp(user->username, account) == 0)
+        {
+            /*判断密码是否相同*/
+            if (strcmp(user->password, password) == 0)
+            {
+                /*关闭文件*/
+                if (fclose(fp)!= 0)
+                {
+                    closegraph();
+                    printf("\nError in closing file UserInfo.");
+                    delay(3000);
+                    exit(1);
+                }
+                /*释放空间*/
+                free(user);
+                user = NULL;
+                // 存在相同的用户名和密码 (返回 1)
+                return 1;
+            }
+        }
+    }
+    /*关闭文件*/
+    if (fclose(fp)!= 0)
+    {
+        closegraph();
+        printf("\nError in closing file UserInfo.");
+        delay(3000);
+        exit(1);
+    }
+    /*释放空间*/
+    free(user);
+    user = NULL;
+    return 0; // 不存在相同的用户名和密码 (返回 0)
+}
+
+/**************************************************
+    DESCRIPTION: 密码不少于5位
+    KeyIn: char* password
+    RETURN: 0 密码少于5位，1 表示符合要求
+**************************************************/
+int judge_password_length(char* password)
+{
+    int i;
+    for (i = 0; i < 13; i++)
+    {
+        if (password[i] == '\0')
+        {
+            break;
+        }
+    }
+    //密码不超过五位则不符合要求
+    if (i < PASSWORD_MIN_LENGTH)
+    {
+        return 0;
+    }else
+    {
+        return 1;
+    }
+}
+
+/**************************************************
+    DESCRIPTION: 账户信息写入文件
+    KeyIn: char *account, char *password
+    RETURN: 无
+**************************************************/
+void write_user_info(char *account, char *password)
+{
+    FILE* fp;
+	User* user = NULL;
+
+	int i;
+
+	if ((fp = fopen("database\\UserInfo.dat", "rb+")) == NULL)
+	{
+        closegraph();
+		printf("\nUserInfo.dat error file");
+		delay(3000);
+		exit(1);//打开失败，退出程序
+	}else
+    {
+        if ((user = (User*)malloc(sizeof(User))) == NULL)
+        {
+            closegraph();
+            printf("memory error WrUserInf");
+            delay(3000);
+            exit(1);//分配空间不足，退出程序
+        }else
+        {
+            //写入账户信息
+            strcpy(user->username, account);
+            strcpy(user->password, password);
+            fseek(fp, 0, SEEK_END);
+            fwrite(user, sizeof(User), 1, fp);
+            if (fclose(fp) != 0)//关闭文件
+            {
+                closegraph();
+                printf("\nError in closing file UserInfo.");
+                delay(3000);
+                exit(1);
+            }
+            free(user);
+            user = NULL;
+        }
+    }
 }
