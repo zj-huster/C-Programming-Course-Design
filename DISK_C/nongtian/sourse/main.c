@@ -21,6 +21,10 @@ void main()
                 sign_up(&flag);
                 break;
 
+            case FORGET_PASSWORD:
+                forget_password(&flag);
+                break;
+
             default:
                 break;
         }

@@ -333,3 +333,66 @@ void write_user_info(char *account, char *password)
         }
     }
 }
+
+/**************************************************
+    DESCRIPTION: 忘记密码后覆写用户信息
+    KeyIn: char *account, char *password
+    RETURN: 无
+**************************************************/
+void overwrite_user_info(char *account, char *password)
+{
+    FILE* fp;
+	User* user = NULL;
+
+	int i;
+    int length;
+
+	if ((fp = fopen("database\\UserInfo.dat", "rb+")) == NULL)
+	{
+        closegraph();
+		printf("\nUserInfo.dat error file");
+		delay(3000);
+		exit(1);//打开失败，退出程序
+	}else
+    {
+        if ((user = (User*)malloc(sizeof(User))) == NULL)
+        {
+            closegraph();
+            printf("memory error WrUserInf");
+            delay(3000);
+            exit(1);//分配空间不足，退出程序
+        }else
+        {
+            /*重新写入账户信息*/
+
+            //计算用户数量
+            fseek(fp, 0, SEEK_END);
+            length = ftell(fp) / sizeof(User); // 账户数量
+            for (i = 0; i < length; i++)
+            {
+                //找到用户位置
+                fseek(fp, i * sizeof(User), SEEK_SET);
+                fread(user, sizeof(User), 1, fp);
+                if (strcmp(user->username, account) == 0)
+                {
+                    //重新写入
+                    fseek(fp, i * sizeof(User), SEEK_SET);//复位到目标用户位置，在fread时后移了一位
+                    strcpy(user->username, account);
+                    strcpy(user->password, password);
+                    fwrite(user, sizeof(User), 1, fp);
+                }
+            }
+
+            /*关闭文件，释放空间*/
+            if (fclose(fp) != 0)//关闭文件
+            {
+                closegraph();
+                printf("\nError in closing file UserInfo.");
+                delay(3000);
+                exit(1);
+            }
+            free(user);
+            user = NULL;
+        }
+    }
+}

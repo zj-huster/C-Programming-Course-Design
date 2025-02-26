@@ -19,6 +19,7 @@
 
 #define WELCOME 1
 #define SIGN_UP 2
+#define FORGET_PASSWORD 3
 
 typedef struct
 {

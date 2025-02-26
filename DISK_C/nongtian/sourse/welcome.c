@@ -151,6 +151,7 @@ void welcome(int *flag)
         if(mouse_left_press_check(500, 330, 600, 350) == 1)
         {
             //×ó¼üµ¥»÷Íü¼ÇÃÜÂë°´Å¥
+            *flag = FORGET_PASSWORD;
             break;
         }
         else if (mouse_hover(500, 330, 600, 350) == 1)
